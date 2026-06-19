@@ -5,12 +5,12 @@ import os, requests, math
 import streamlit.components.v1 as components
 from datetime import datetime, timedelta
 
-st.set_page_config(page_title="토비&마루 스마트 홈 v13.5", layout="wide")
-st.markdown("<h1 style='text-align: center; color: #deff9a;'>🐶 토비 · 마루 스마트 홈 인프라 v13.5</h1>", unsafe_allow_html=True)
+st.set_page_config(page_title="토비&마루 스마트 홈 v14.0", layout="wide")
+st.markdown("<h1 style='text-align: center; color: #deff9a;'>🐶 토비 · 마루 스마트 홈 인프라 v14.0</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #94a3b8;'>지능형 메디컬 관제 및 위치 기반 멀티모달 헬스케어 시스템</p>", unsafe_allow_html=True)
 st.write("---")
 
-# 📱 사이드바 가볍게 정리 (클라우드 전용)
+# 📱 사이드바
 st.sidebar.subheader("🛰️ 시스템 상태")
 st.sidebar.success("정상 가동 중 (Cloud Node)")
 st.sidebar.info("학교 발표장 공용 PC 완벽 호환 모드")
@@ -41,7 +41,6 @@ elif w_score >= 50: wc4.warning("⚠️ 개체별 상태 주의 요망")
 else: wc4.error("🚨 실외 활동 및 산책 제한")
 st.write("---")
 
-# 하베신 구면 거리 연산 함수
 def calculate_distance(lat1, lon1, lat2, lon2):
     R = 6371000  
     phi1, phi2 = math.radians(lat1), math.radians(lat2)
@@ -49,7 +48,6 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     a = math.sin(dp / 2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(dl / 2)**2
     return round(R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a)), 1)
 
-# [유튜브 재생 완벽 해결] 전용 임베더 컴포넌트 함수
 def play_dog_youtube(video_id, title):
     st.markdown(f"##### 📺 {title}")
     embed_url = f"https://www.youtube.com/embed/{video_id}?rel=0"
@@ -70,10 +68,17 @@ with tab_toby:
     st.write("---")
     col1, col2 = st.columns([1, 1.4])
     with col1:
+        # 📸 토비 사진 업로더 엔진 완벽 복구
+        if os.path.exists("toby_saved.png"): 
+            st.image("toby_saved.png", use_container_width=True)
+        t_up_file = st.file_uploader("📸 토비 프로필 사진 등록/변경", type=["png", "jpg", "jpeg"], key="t_pic_up")
+        if t_up_file:
+            with open("toby_saved.png", "wb") as out_f: out_f.write(t_up_file.getbuffer())
+            st.rerun()
         t_weight = st.number_input("⚖️ 실시간 체중 입력 (kg)", 1.0, 10.0, 3.2, step=0.1, key="t_w_cl")
     with col2:
         t_rer = round(70 * (t_weight ** 0.75), 1)
-        t_status = "🔺 비만 관리군" if t_weight > 3.2 else "🟢 정상 밸런스 체중"
+        t_status = f"🔺 비만 관리군 ({round(t_weight - 3.2, 2)}kg 초과)" if t_weight > 3.2 else "🟢 정상 밸런스 체중"
 
         toby_table = {
             "분류 지표": ["견종 / 모색", "현재 관리 상태", "정량적 기초대사량(RER)"],
@@ -103,6 +108,13 @@ with tab_maru:
     st.write("---")
     col3, col4 = st.columns([1, 1.4])
     with col3:
+        # 📸 마루 사진 업로더 엔진 완벽 복구
+        if os.path.exists("maru_saved.png"): 
+            st.image("maru_saved.png", use_container_width=True)
+        m_up_file = st.file_uploader("📸 마루 프로필 사진 등록/변경", type=["png", "jpg", "jpeg"], key="m_pic_up")
+        if m_up_file:
+            with open("maru_saved.png", "wb") as out_f: out_f.write(m_up_file.getbuffer())
+            st.rerun()
         m_weight = st.number_input("⚖️ 실시간 체중 입력 (kg)", 5.0, 25.0, 9.8, step=0.1, key="m_w_cl")
     with col4:
         m_rer = round(70 * (m_weight ** 0.75), 1)
@@ -133,7 +145,7 @@ with tab_maru:
     time_delta = target_dt - now_dt
     st.success(f"🎯 **[{routine_name}] 대장 운동 예측 시점:** {target_dt.strftime('%p %I:%M')} (남은 시간: {time_delta.seconds//3600}시간 {(time_delta.seconds%3600)//60}분)")
     st.write("---")
-    play_dog_youtube("K_Nf-v-xG9A", "마루 사냥 본능 충족용 고해상도 네이처 필드")
+    play_dog_youtube("K_Nf-v-xG9A", "maru natural field tracking")
 
 with tab_lbs:
     st.subheader("🛰️ 위치 기반 지오펜싱 및 메타볼릭 관제 센터")
